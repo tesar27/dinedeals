@@ -7,7 +7,12 @@ class ListViewWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       // Overall margin around the entire list
-      padding: const EdgeInsets.all(12.0),
+      padding: const EdgeInsets.only(
+        top: 75.0,
+        left: 12.0,
+        right: 12.0,
+        bottom: 12.0,
+      ), // Added top padding; adjust value as needed
       child: ListView.builder(
         itemCount: 10, // Replace with actual data
         itemBuilder: (context, index) {
