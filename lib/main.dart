@@ -1,11 +1,11 @@
 // ignore_for_file: avoid_print
 
+import 'package:dinedeals/widgets/bottom_nav.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'providers/app_provider.dart';
 import 'screens/discover.dart';
 import 'screens/profile.dart';
-import 'widgets/floating_bottom_nav.dart';
 
 void main() {
   runApp(
@@ -87,19 +87,14 @@ class _HomePageState extends State<HomePage> {
     return Consumer<AppProvider>(
       builder: (context, appProvider, child) {
         return Scaffold(
-          body: Stack(
-            children: [
-              PageView(
-                controller: _pageController,
-                onPageChanged: (index) => appProvider.setIndex(index),
-                physics: const NeverScrollableScrollPhysics(),
-                children: const [DiscoverPage(), ProfilePage()],
-              ),
-              FloatingBottomNav(
-                currentIndex: appProvider.currentIndex,
-                onTap: (index) => _onNavTap(context, index),
-              ),
-            ],
+          body: PageView(
+            controller: _pageController,
+            onPageChanged: (index) => appProvider.setIndex(index),
+            children: const [DiscoverPage(), ProfilePage()],
+          ),
+          bottomNavigationBar: BottomNav(
+            currentIndex: appProvider.currentIndex,
+            onTap: (index) => _onNavTap(context, index),
           ),
         );
       },
