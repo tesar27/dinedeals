@@ -1,7 +1,9 @@
+import 'package:dinedeals/services/location_service.dart';
+import 'package:dinedeals/widgets/discover/location_button.dart';
+import 'package:dinedeals/widgets/discover/top_bar.dart';
 import 'package:flutter/material.dart';
 import '../widgets/discover/map_view.dart';
 import '../widgets/discover/list_view.dart';
-import '../widgets/discover/city_selector.dart';
 import '../widgets/discover/view_toggle.dart';
 import '../widgets/discover/city_sheet.dart';
 
@@ -32,41 +34,69 @@ class _DiscoverPageState extends State<DiscoverPage> {
     ).showSnackBar(const SnackBar(content: Text('Search tapped!')));
   }
 
+  // Add these methods to your State class:
+  bool _isLocating = false;
+
+  Future<void> _handleLocationTap() async {
+    setState(() => _isLocating = true);
+
+    final position = await LocationService.getCurrentLocation();
+
+    if (position != null && mounted) {
+      // Animate camera to user location
+      // mapController.animateCamera(...)
+    }
+
+    if (mounted) setState(() => _isLocating = false);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        _isMapView ? const MapView() : const ListViewWidget(),
-        Positioned(
-          top: 50,
-          left: 20,
-          right: 20,
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.9),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                CitySelector(
-                  selectedCity: _selectedCity,
-                  onTap: _showCitySheet,
-                ),
-                IconButton(
-                  icon: const Icon(Icons.search),
-                  onPressed: _onSearchTap,
-                ),
-              ],
+    return Scaffold(
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(kToolbarHeight),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.01),
+                blurRadius: 8,
+                spreadRadius: 0,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: AppBar(
+            elevation: 0,
+            backgroundColor: Colors.transparent,
+            title: TopBar(
+              selectedCity: _selectedCity,
+              onCityTap: _showCitySheet,
+              onSearchTap: _onSearchTap,
             ),
           ),
         ),
-        Positioned(
-          top: 120,
-          right: 20,
-          child: ViewToggle(isMapView: _isMapView, onToggle: _toggleView),
-        ),
-      ],
+      ),
+      body: Stack(
+        children: [
+          _isMapView ? const MapView() : const ListViewWidget(),
+          Positioned(
+            top: 20,
+            right: 20,
+            child: ViewToggle(isMapView: _isMapView, onToggle: _toggleView),
+          ),
+          if (_isMapView)
+            Positioned(
+              right: 20,
+              bottom: 20,
+              child: LocationButton(
+                isLoading: _isLocating,
+                onPressed: _handleLocationTap,
+              ),
+            ),
+        ],
+      ),
     );
   }
 }
